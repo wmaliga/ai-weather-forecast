@@ -1,4 +1,5 @@
 from aws_cdk import (
+    Duration,
     Stack,
     aws_dynamodb as dynamodb,
     aws_events as events,
@@ -16,6 +17,7 @@ class ProcessStack(Stack):
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
+        ### Current weather lambda
         current_weather_lambda = lambda_python.PythonFunction(
             self,
             id=f"{construct_id}-current-weather",
@@ -30,6 +32,23 @@ class ProcessStack(Stack):
 
         table.grant_write_data(current_weather_lambda)
 
+        ### Historical weather lambda
+        historical_weather_lambda = lambda_python.PythonFunction(
+            self,
+            id=f"{construct_id}-historical-weather",
+            function_name=f"{construct_id}-historical-weather",
+            runtime=_lambda.Runtime.PYTHON_3_10,
+            entry="src/function/historical_weather",
+            timeout=Duration.minutes(15),
+            environment={
+                "TABLE_NAME": table.table_name,
+                "COORDINATE": "53.11,15.81",
+            },
+        )
+
+        table.grant_write_data(historical_weather_lambda)
+
+        # Scheduled events
         every_hour_schedule = events.Schedule.cron(day="*", hour="*", minute="0")
         current_weather_target = event_targets.LambdaFunction(
             handler=current_weather_lambda

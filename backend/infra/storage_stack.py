@@ -22,4 +22,5 @@ class StorageStack(Stack):
                 name="timestamp",
                 type=dynamodb.AttributeType.STRING,
             ),
+            billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
         )
