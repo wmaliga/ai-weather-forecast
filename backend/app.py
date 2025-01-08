@@ -15,7 +15,7 @@ env = cdk.Environment(
 
 app = cdk.App()
 
-StorageStack(app, f"{stack_name}-storage", env=env)
-ProcessStack(app, f"{stack_name}-process", env=env)
+storage_stack = StorageStack(app, f"{stack_name}-storage", env=env)
+ProcessStack(app, f"{stack_name}-process", env=env, table=storage_stack.table)
 
 app.synth()

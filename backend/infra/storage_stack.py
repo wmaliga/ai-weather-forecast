@@ -10,7 +10,7 @@ class StorageStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        dynamodb.Table(
+        self.table = dynamodb.Table(
             self,
             f"{construct_id}-table",
             table_name=f"{construct_id}-table",
